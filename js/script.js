@@ -1,4 +1,7 @@
 {
+  const opts = {
+    articleSelector: '.post',
+  };
 
   const titleClickHandler = function(event){
     const clickedElement = this;
@@ -32,15 +35,14 @@
 
   /* Generate title links*/
 
-  const optArticleSelector = '.post',
-    optTitleSelector = '.post-title',
+  const optTitleSelector = '.post-title',
     optTitleListSelector = '.titles',
     optArticleTagsSelector = '.post-tags .list',
     optArticleAuthorSelector = '.post-author',
     optTagListSelector = '.tags', //umozliwia odnalezienie listy tagow w prawej kolumnie
     optCloudClassCount = 5;
   optCloudClassPrefix = 'tag-size-',
-  optAuthorListSelector = '.authors';
+  optAuthorListSelector ='.authors';
 
   const addClickListenerToTitle = function(){
     const links = document.querySelectorAll('.titles a');
@@ -56,7 +58,7 @@
     titleList.innerHTML = '';
 
     /* [DONE] for each article */
-    const articles = document.querySelectorAll(optArticleSelector + customSelector);
+    const articles = document.querySelectorAll(opts.articleSelector + customSelector);
     for (let article of articles){
 
       /* [DONE] get the article id */
@@ -96,7 +98,7 @@
 
   function generateTags(){
     /* [DONE] find all articles */
-    const articles = document.querySelectorAll(optArticleSelector);
+    const articles = document.querySelectorAll(opts.articleSelector);
     /* [DONE]START LOOP: for every article: */
     for (let article of articles) {
 
@@ -208,7 +210,7 @@
 
   const generateAuthors = function () {
     /* find all articles */
-    const articles = document.querySelectorAll(optArticleSelector);
+    const articles = document.querySelectorAll(opts.articleSelector);
     /* find & get author name in the article */
     for (let article of articles) {
       const authorWrapper = article.querySelector(optArticleAuthorSelector);
@@ -243,7 +245,7 @@
     /* [NEW] create a new variable allTags with an object */
     let allTags = {};
     /* find all articles */
-    const articles = document.querySelectorAll(optArticleSelector);
+    const articles = document.querySelectorAll(opts.articleSelector);
     /* START LOOP: for every article: */
     for (let article of articles) {
       /* find tags wrapper */
@@ -297,14 +299,13 @@
     /* Create object where you put authors */
     let allAuthors = {};
     /* pick all articles in document */
-    const articles = document.querySelectorAll(optArticleSelector);
+    const articles = document.querySelectorAll(opts.articleSelector);
 
     /* pick an empty list where you will insert list of authors */
     const authorList = document.querySelector(optAuthorListSelector);
 
     /* first loop - search through articles */
     for (let article of articles) {
-      const authorWrapper = article.querySelector(optArticleAuthorSelector);
       /* look for data author and add them to object  */
       const articleAuthor = article.getAttribute('data-author');
       if(!allAuthors[articleAuthor]) {
