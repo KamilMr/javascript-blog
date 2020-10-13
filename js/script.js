@@ -37,9 +37,10 @@
     optTitleListSelector = '.titles',
     optArticleTagsSelector = '.post-tags .list',
     optArticleAuthorSelector = '.post-author',
-    optTagListSelector = '.tags.list', //umozliwia odnalezienie listy tagow w prawej kolumnie
+    optTagListSelector = '.tags', //umozliwia odnalezienie listy tagow w prawej kolumnie
     optCloudClassCount = 5;
-  optCloudClassPrefix = 'tag-size-';
+  optCloudClassPrefix = 'tag-size-',
+  optAuthorListSelector = '.authors';
 
   const addClickListenerToTitle = function(){
     const links = document.querySelectorAll('.titles a');
@@ -80,7 +81,6 @@
       max: 0,
     };
     for (let tag in tags) {
-      console.log(tag + ' is used ' + tags[tag] + ' times');
       params.max = Math.max(tags[tag], params.max);
       params.min = Math.min(tags[tag], params.min);
     }
@@ -88,12 +88,9 @@
   };
 
   const calculateTagClass = function (count, params) {
-    console.log(count, params);
 
     const calculation = ((count-params.min)/(params.max-params.min))* (optCloudClassCount - 1) + 1;
     const classNumber = Math.floor(calculation);
-    console.log(classNumber);
-    console.log(classNumber);
     return optCloudClassPrefix + classNumber;
   };
 
@@ -215,6 +212,7 @@
     /* find & get author name in the article */
     for (let article of articles) {
       const authorWrapper = article.querySelector(optArticleAuthorSelector);
+
       const articleAuthor = article.getAttribute('data-author');
       /* connect author name with the link */
       const linkHTML = '<a href="#'+articleAuthor+'">'+articleAuthor+'</a>';
@@ -233,10 +231,17 @@
   };
   addClickListenersToAuthor ();
 
+  const addClickSideListenersToAuthor = function () {
+    const allLinksToAuthors = document.querySelectorAll('.authors a');
+    for (let linksToAuthor of allLinksToAuthors) {
+      linksToAuthor.addEventListener('click', authorClickHandler);
+    }
+  };
+  addClickListenersToAuthor ();
+
   const generateSideTags = function (){
     /* [NEW] create a new variable allTags with an object */
     let allTags = {};
-
     /* find all articles */
     const articles = document.querySelectorAll(optArticleSelector);
     /* START LOOP: for every article: */
@@ -260,20 +265,18 @@
         if(!allTags[tag]){
           /* [NEW] add generated code to allTags array */
           allTags[tag] = 1;
-        } else {allTags[tag]++;
-        }
-
+        } else {allTags[tag]++;}
       }/* END LOOP: for each tag */
 
       /* insert HTML of all the links into the tags wrapper */
       tagsWrapper.innerHTML = html;
-
-
     } /* END LOOP: for every article: */
+
+
     /* [NEW] find list of tags in right column */
-    const tagList = document.querySelector('.tags');
+    const tagList = document.querySelector(optTagListSelector);
+
     const tagsParams = calculateTagsParams(allTags);
-    console.log('tagsParams:', allTags);
     /* [NEW] create variable for all links HTML code */
     let allTagsHTML = '';
     /* [NEW] START LOOP: for each tag in allTags: */
@@ -282,15 +285,42 @@
       allTagsHTML += '<li><a href="#tag-'+tag +'" class="'+calculateTagClass(allTags[tag], tagsParams)+'">'+tag+'</a></li>';
     }
     /* [NEW] END LOOP: for each tag in allTags: */
-
     /*[NEW] add HTML from allTagsHTML to tagList */
     tagList.innerHTML = allTagsHTML;
-
     // add Click LIstener to Side Tags
     addClickListenersToTags();
 
   };
   generateSideTags();
 
+  const generateSideAuthors = function () {
+    /* Create object where you put authors */
+    let allAuthors = {};
+    /* pick all articles in document */
+    const articles = document.querySelectorAll(optArticleSelector);
+
+    /* pick an empty list where you will insert list of authors */
+    const authorList = document.querySelector(optAuthorListSelector);
+
+    /* first loop - search through articles */
+    for (let article of articles) {
+      const authorWrapper = article.querySelector(optArticleAuthorSelector);
+      /* look for data author and add them to object  */
+      const articleAuthor = article.getAttribute('data-author');
+      if(!allAuthors[articleAuthor]) {
+        allAuthors[articleAuthor] = 1;
+      } else {allAuthors[articleAuthor]++;}
+
+      /* after that you are creating variable for links */
+      let allLinksHTML = '';
+      for (let articleAuthor in allAuthors){
+        allLinksHTML += '<li><a href="#'+articleAuthor +'" class="author-name">'+articleAuthor+' ( '+allAuthors[articleAuthor]+')</a></li>';
+      }
+      authorList.innerHTML = allLinksHTML;
+      addClickSideListenersToAuthor();
+    }
+
+  };
+  generateSideAuthors ();
 }
 
