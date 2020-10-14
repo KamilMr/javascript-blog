@@ -1,4 +1,11 @@
 {
+  const templates = {
+    articleLink: Handlebars.compile(document.querySelector('#template-article-link').innerHTML),
+    tagCloudLink: Handlebars.compile(document.querySelector('#template-tag-cloud-link').innerHTML),
+    authorLink: Handlebars.compile(document.querySelector('#template-author-link').innerHTML)
+  };
+
+
   const opts = {
     articleSelector: '.post',
   };
@@ -68,7 +75,8 @@
       const articleTitle = article.querySelector(optTitleSelector).innerHTML;
 
       /* [DONE] get the title from the title element */
-      const linkHTML ='<li><a href="#'+ articleId +'"><span>'+articleTitle+'</span></a></li>';
+      const linkHTMLData = {id: articleId, title: articleTitle};
+      const linkHTML = templates.articleLink(linkHTMLData);
       /* [DONE] create HTML of the link & insert link into titleList */
       titleList.insertAdjacentHTML('beforeend', linkHTML);
     }
@@ -120,7 +128,8 @@
 
 
         /*[DONE] generate HTML of the link */
-        const linkHTML = '<li><a href="#tag-'+ tag +'"> '+ tag +'</a></li>';
+        const linkHTMLData = {id: tag, title: tag};
+        const linkHTML = templates.articleLink(linkHTMLData);
 
         /*[DONE - unused] add generated code to html variable */
 
@@ -141,6 +150,7 @@
 
 
   const tagClickHandler = function(event){
+    console.log('addClickListener is runing');
     /*[DONE] make new constant named "clickedElement" and give it the value of "this" */
     const clickedElement = this;
 
@@ -174,6 +184,7 @@
   };
 
   const  addClickListenersToTags = function (){
+
     /* find all links to tags */
     const allLinksToTags = document.querySelectorAll('a[href^="#tag-"]');
 
@@ -217,7 +228,8 @@
 
       const articleAuthor = article.getAttribute('data-author');
       /* connect author name with the link */
-      const linkHTML = '<a href="#'+articleAuthor+'">'+articleAuthor+'</a>';
+      const linkHTMLData = {id: articleAuthor, title: articleAuthor};
+      const linkHTML = templates.articleLink(linkHTMLData);
       /* insert HTML of all links into tags wrapper */
       authorWrapper.insertAdjacentHTML('beforeend', linkHTML);
     }
@@ -280,15 +292,20 @@
 
     const tagsParams = calculateTagsParams(allTags);
     /* [NEW] create variable for all links HTML code */
-    let allTagsHTML = '';
+    const allTagsData = {tags: []};
     /* [NEW] START LOOP: for each tag in allTags: */
     for (let tag in allTags) {
       /* [NEW] generate code of a link and add it to allTagsHTML */
-      allTagsHTML += '<li><a href="#tag-'+tag +'" class="'+calculateTagClass(allTags[tag], tagsParams)+'">'+tag+'</a></li>';
+      allTagsData.tags.push({
+        tag: tag,
+        count: allTags[tag],
+        className: calculateTagClass(allTags[tag], tagsParams)
+      });
     }
     /* [NEW] END LOOP: for each tag in allTags: */
     /*[NEW] add HTML from allTagsHTML to tagList */
-    tagList.innerHTML = allTagsHTML;
+    tagList.innerHTML = templates.tagCloudLink(allTagsData);
+    console.log(allTagsData);
     // add Click LIstener to Side Tags
     addClickListenersToTags();
 
@@ -311,15 +328,21 @@
       if(!allAuthors[articleAuthor]) {
         allAuthors[articleAuthor] = 1;
       } else {allAuthors[articleAuthor]++;}
-
+    }
       /* after that you are creating variable for links */
       let allLinksHTML = '';
+      const allAuthorData = {author: []};
       for (let articleAuthor in allAuthors){
-        allLinksHTML += '<li><a href="#'+articleAuthor +'" class="author-name">'+articleAuthor+' ( '+allAuthors[articleAuthor]+')</a></li>';
+        // allLinksHTML += '<li><a href="#'+articleAuthor +'" class="author-name">'+articleAuthor+' ( '+allAuthors[articleAuthor]+')</a></li>';
+        allAuthorData.author.push ({
+          author: articleAuthor,
+          count: allAuthors[articleAuthor]
+        });
       }
-      authorList.innerHTML = allLinksHTML;
+      authorList.innerHTML = templates.authorLink(allAuthorData);
+      console.log(allAuthorData);
       addClickSideListenersToAuthor();
-    }
+
 
   };
   generateSideAuthors ();
